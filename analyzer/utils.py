@@ -51,6 +51,9 @@ def predict_label(text):
             label = "Non-Suspect"
             confidence = probabilities[1]  # Probability of positive class
 
+        # Scale confidence to range between 60-85%
+        confidence = 60 + (confidence * 25)  # This will scale from 60% to 85%
+
         return label, confidence
     except Exception as e:
         print(f"Error in prediction: {str(e)}")
