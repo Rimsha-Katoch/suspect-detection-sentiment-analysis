@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block title %}Analytics - Suspect Detection{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body p-4">
+                <h2 class="card-title text-center mb-4">
+                    <i class="fas fa-chart-line me-2"></i>Model Performance Analytics
+                </h2>
+                
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card bg-gradient-primary text-white">
+                            <div class="card-body text-center p-4">
+                                <h5 class="card-title">Accuracy</h5>
+                                <h2 class="display-4 mb-0">{{ accuracy|floatformat:2 }}%</h2>
+                                <div class="mt-3">
+                                    <span class="badge bg-light text-dark">
+                                        <i class="fas fa-bullseye me-1"></i>Overall Performance
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-gradient-success text-white">
+                            <div class="card-body text-center p-4">
+                                <h5 class="card-title">Precision</h5>
+                                <h2 class="display-4 mb-0">{{ precision|floatformat:2 }}%</h2>
+                                <div class="mt-3">
+                                    <span class="badge bg-light text-dark">
+                                        <i class="fas fa-check-double me-1"></i>True Positives
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-gradient-info text-white">
+                            <div class="card-body text-center p-4">
+                                <h5 class="card-title">Recall</h5>
+                                <h2 class="display-4 mb-0">{{ recall|floatformat:2 }}%</h2>
+                                <div class="mt-3">
+                                    <span class="badge bg-light text-dark">
+                                        <i class="fas fa-search me-1"></i>Detection Rate
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-gradient-warning text-white">
+                            <div class="card-body text-center p-4">
+                                <h5 class="card-title">F1 Score</h5>
+                                <h2 class="display-4 mb-0">{{ f1_score|floatformat:2 }}%</h2>
+                                <div class="mt-3">
+                                    <span class="badge bg-light text-dark">
+                                        <i class="fas fa-balance-scale me-1"></i>Balanced Score
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mb-4">
+                    <a href="{% url 'home' %}" class="btn btn-primary">
+                        <i class="fas fa-upload me-2"></i>Upload New File
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body p-4">
+                <h3 class="card-title mb-4">
+                    <i class="fas fa-chart-pie me-2"></i>Comment Distribution
+                </h3>
+                <canvas id="distributionChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body p-4">
+                <h3 class="card-title mb-4">
+                    <i class="fas fa-chart-bar me-2"></i>Performance Metrics
+                </h3>
+                <canvas id="metricsChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Distribution Chart
+    const distributionCtx = document.getElementById('distributionChart').getContext('2d');
+    new Chart(distributionCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Suspect', 'Non-Suspect'],
+            datasets: [{
+                data: [{{ suspect_count }}, {{ non_suspect_count }}],
+                backgroundColor: ['#dc3545', '#28a745'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    // Metrics Chart
+    const metricsCtx = document.getElementById('metricsChart').getContext('2d');
+    new Chart(metricsCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Accuracy', 'Precision', 'Recall', 'F1 Score'],
+            datasets: [{
+                label: 'Performance Metrics (%)',
+                data: [
+                    {{ accuracy|floatformat:2 }},
+                    {{ precision|floatformat:2 }},
+                    {{ recall|floatformat:2 }},
+                    {{ f1_score|floatformat:2 }}
+                ],
+                backgroundColor: [
+                    '#007bff',
+                    '#28a745',
+                    '#17a2b8',
+                    '#ffc107'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %} 

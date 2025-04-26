@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Results - Suspect Detection</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 800px;
+            margin-top: 50px;
+        }
+        .btn-insights {
+            margin-top: 20px;
+        }
+        table {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 class="text-center">Detection Results</h2>
+
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Comment</th>
+            <th>Label</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for comment in results %}
+            <tr>
+                <td>{{ comment.comment }}</td>
+                <td>{{ comment.label }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Chart -->
+    <canvas id="chart" height="100"></canvas>
+
+    <!-- Word Cloud -->
+    <div class="text-center mt-4">
+        <h5>Word Cloud</h5>
+        <img src="{{ wordcloud|cut:'media/' }}" class="img-fluid" alt="Word Cloud">
+    </div>
+
+    <!-- Buttons -->
+    <div class="text-center btn-insights mt-4">
+        <a href="{% url 'chart_page' %}" class="btn btn-outline-dark btn-lg">📈 View Detailed Chart</a>
+    </div>
+    <div class="text-center btn-insights mt-2">
+        <a href="{% url 'clear_session' %}" class="btn btn-outline-danger btn-lg">🔁 Clear & Start Over</a>
+    </div>
+</div>
+
+<script>
+    const ctx = document.getElementById('chart').getContext('2d');
+    const suspectCount = {{ suspect_count }};
+    const nonSuspectCount = {{ non_suspect_count }};
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Suspect', 'Non-Suspect'],
+            datasets: [{
+                label: 'Comment Count',
+                data: [suspectCount, nonSuspectCount],
+                backgroundColor: ['#dc3545', '#28a745'],
+                borderColor: ['#c82333', '#218838'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+</body>
+</html>
